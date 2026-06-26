@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaaS Health — The Beatstrap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style id="theme-vars">/* injetado via JS */</style>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--fundo);
+  color: var(--texto);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── LAYOUT ─────────────────────────────────────── */
+.app { display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar {
+  width: 272px; flex-shrink: 0;
+  background: var(--superficie);
+  border-right: 1px solid var(--borda);
+  padding: 32px 24px;
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh;
+  overflow-y: auto;
+}
+
+.logo {
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px; font-weight: 700;
+  color: var(--texto);
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.logo-badge {
+  background: var(--roxo);
+  color: #fff;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 7px; border-radius: 4px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.logo-sub {
+  font-size: 11px; color: var(--textoMuted);
+  margin-bottom: 32px; line-height: 1.4;
+}
+
+.steps { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+
+.step-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 10px; border-radius: 8px;
+  cursor: pointer; transition: background 0.15s;
+  border: 1px solid transparent;
+}
+.step-item:hover { background: var(--superficie2); }
+.step-item.active {
+  background: var(--roxoDim);
+  border-color: rgba(91,79,232,0.2);
+}
+
+.step-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid var(--borda);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+  flex-shrink: 0; margin-top: 1px;
+  color: var(--textoMuted); transition: all 0.2s;
+}
+.step-item.active .step-num { background: var(--roxo); border-color: var(--roxo); color: #fff; }
+.step-item.done   .step-num { background: var(--verde); border-color: var(--verde); color: #fff; }
+.step-num-check { display: none; }
+.step-item.done .step-num-check { display: inline; }
+.step-item.done .step-num-digit { display: none; }
+
+.step-title { font-size: 13px; font-weight: 600; color: var(--textoMuted); }
+.step-item.active .step-title,
+.step-item.done   .step-title { color: var(--texto); }
+.step-desc { font-size: 11px; color: var(--textoSuave); margin-top: 1px; line-height: 1.4; }
+.step-connector { width: 1px; height: 12px; background: var(--borda); margin-left: 20px; }
+
+.sidebar-footer {
+  font-size: 10px; color: var(--textoSuave);
+  border-top: 1px solid var(--borda);
+  padding-top: 14px; line-height: 1.6; margin-top: 16px;
+}
+
+/* ── MAIN ─────────────────────────────────────── */
+.main { flex: 1; padding: 40px 48px; max-width: 900px; }
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* Progress */
+.progress-wrap { margin-bottom: 36px; }
+.progress-bar { height: 3px; background: var(--borda); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--roxo); border-radius: 2px; transition: width 0.4s ease; }
+.progress-label { font-size: 11px; color: var(--textoMuted); margin-top: 6px; }
+
+/* Step header */
+.step-eyebrow {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--roxo); margin-bottom: 6px;
+}
+.step-heading {
+  font-family: 'Manrope', sans-serif;
+  font-size: 24px; font-weight: 700;
+  color: var(--texto); line-height: 1.2; margin-bottom: 6px;
+}
+.step-sub { font-size: 14px; color: var(--textoMuted); max-width: 540px; margin-bottom: 28px; }
+
+/* ── PERIOD TABS ──────────────────────────────── */
+.period-tabs {
+  display: inline-flex;
+  background: var(--superficie2);
+  border-radius: 8px; padding: 3px;
+  margin-bottom: 24px; gap: 2px;
+}
+.period-tab {
+  padding: 6px 16px; border-radius: 6px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; border: none;
+  background: transparent; color: var(--textoMuted);
+  transition: all 0.15s; font-family: 'Manrope', sans-serif;
+}
+.period-tab.active { background: var(--superficie); color: var(--texto); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+/* ── FORM ─────────────────────────────────────── */
+.section-label {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--textoMuted); margin: 24px 0 12px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--borda);
+  display: flex; align-items: center; gap: 8px;
+}
+.section-label .optional-tag {
+  font-size: 10px; font-weight: 500;
+  background: var(--superficie2); color: var(--textoSuave);
+  padding: 1px 7px; border-radius: 4px; letter-spacing: 0;
+  text-transform: none;
+}
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 8px; }
+.form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field.full { grid-column: 1 / -1; }
+
+.field-label {
+  font-size: 12px; font-weight: 600;
+  color: var(--texto);
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* Tooltip */
+.tip {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--superficie2); border: 1px solid var(--borda);
+  color: var(--textoMuted); font-size: 9px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: help; position: relative; flex-shrink: 0;
+}
+.tip:hover .tip-text { display: block; }
+.tip-text {
+  display: none; position: absolute;
+  bottom: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%);
+  background: var(--texto); color: var(--fundo);
+  border-radius: 7px; padding: 8px 12px;
+  font-size: 12px; font-weight: 400;
+  white-space: normal; max-width: 220px;
+  text-transform: none; letter-spacing: 0;
+  z-index: 200; line-height: 1.5;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.tip-text::after {
+  content: ''; position: absolute;
+  top: 100%; left: 50%; transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--texto);
+}
+
+/* Input group */
+.input-group {
+  background: var(--superficie);
+  border: 1.5px solid var(--borda);
+  border-radius: 8px; overflow: hidden;
+  transition: border-color 0.15s;
+}
+.input-group:focus-within { border-color: var(--roxo); }
+
+.input-row { display: flex; align-items: center; }
+.input-prefix, .input-suffix {
+  padding: 0 10px;
+  font-size: 13px; font-weight: 500; color: var(--textoMuted);
+  background: var(--superficie2);
+  border-right: 1px solid var(--borda);
+  height: 40px; display: flex; align-items: center;
+  white-space: nowrap; flex-shrink: 0;
+}
+.input-suffix {
+  border-right: none; border-left: 1px solid var(--borda);
+}
+
+input[type="number"] {
+  flex: 1; width: 100%; min-width: 0;
+  background: transparent; border: none; outline: none;
+  padding: 10px 12px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px; font-weight: 500; color: var(--texto);
+  -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+input[type="number"]::placeholder { color: var(--textoSuave); font-weight: 400; }
+
+/* Slider */
+.slider-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--borda);
+  background: var(--superficie2);
+}
+input[type="range"] {
+  flex: 1; height: 4px; border-radius: 2px;
+  appearance: none; -webkit-appearance: none;
+  background: var(--borda); outline: none; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--roxo); cursor: pointer;
+  box-shadow: 0 1px 4px rgba(91,79,232,0.3);
+  transition: transform 0.1s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.slider-val {
+  font-size: 11px; font-weight: 600; color: var(--roxo);
+  min-width: 54px; text-align: right;
+}
+
+.field-hint { font-size: 11px; color: var(--textoSuave); }
+
+/* Segmented buttons */
+.seg-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg-btn {
+  padding: 7px 13px; border-radius: 7px;
+  border: 1.5px solid var(--borda);
+  background: var(--superficie);
+  color: var(--textoMuted);
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.12s;
+}
+.seg-btn:hover { border-color: var(--roxo); color: var(--texto); }
+.seg-btn.active { background: var(--roxoDim); border-color: var(--roxo); color: var(--roxo); font-weight: 600; }
+
+/* ── BUTTONS ──────────────────────────────────── */
+.btn-row { display: flex; gap: 10px; align-items: center; margin-top: 28px; }
+.btn {
+  padding: 11px 24px; border-radius: 8px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; border: none;
+  transition: all 0.15s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-primary { background: var(--roxo); color: #fff; }
+.btn-primary:hover { background: var(--roxoEscuro); }
+.btn-ghost { background: transparent; color: var(--textoMuted); border: 1.5px solid var(--borda); }
+.btn-ghost:hover { color: var(--texto); border-color: var(--textoMuted); }
+.btn-outline { background: transparent; color: var(--roxo); border: 1.5px solid var(--roxo); }
+.btn-outline:hover { background: var(--roxoDim); }
+.link-btn {
+  font-size: 13px; color: var(--textoMuted);
+  cursor: pointer; text-decoration: underline;
+  background: none; border: none; font-family: inherit;
+}
+.link-btn:hover { color: var(--texto); }
+
+/* ── RESULTS ──────────────────────────────────── */
+.results-top {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 28px;
+  flex-wrap: wrap; gap: 14px;
+}
+
+.health-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 14px; border-radius: 100px;
+  font-size: 12px; font-weight: 700; border: 1px solid;
+}
+.health-pill.healthy { background: var(--verdeDim); color: var(--verde); border-color: var(--verde); }
+.health-pill.warning { background: var(--amareloDim); color: var(--amarelo); border-color: var(--amarelo); }
+.health-pill.critical { background: var(--vermelhoDim); color: var(--vermelho); border-color: var(--vermelho); }
+.health-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* Block */
+.result-block { margin-bottom: 28px; }
+.block-title {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--textoMuted);
+  margin-bottom: 14px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--borda);
+}
+
+/* Metric cards */
+.metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+
+.metric-card {
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 10px; padding: 16px 18px;
+  position: relative; overflow: hidden;
+}
+.metric-card::after {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  border-radius: 10px 10px 0 0;
+}
+.metric-card.ok::after   { background: var(--verde); }
+.metric-card.warn::after { background: var(--amarelo); }
+.metric-card.crit::after { background: var(--vermelho); }
+.metric-card.info::after { background: var(--roxo); }
+
+.metric-label {
+  font-size: 10px; color: var(--textoMuted);
+  font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.metric-value {
+  font-family: 'Manrope', sans-serif;
+  font-size: 24px; font-weight: 700; margin-bottom: 2px;
+}
+.metric-card.ok   .metric-value { color: var(--verde); }
+.metric-card.warn .metric-value { color: var(--amarelo); }
+.metric-card.crit .metric-value { color: var(--vermelho); }
+.metric-card.info .metric-value { color: var(--roxo); }
+.metric-bench { font-size: 11px; color: var(--textoSuave); }
+.metric-diagnosis {
+  font-size: 11px; color: var(--textoMuted);
+  margin-top: 8px; line-height: 1.5;
+  border-top: 1px solid var(--borda); padding-top: 8px;
+}
+
+/* Bench bars */
+.bench-item { margin-bottom: 16px; }
+.bench-top { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+.bench-name { font-weight: 500; color: var(--texto); }
+.bench-yours { font-weight: 700; }
+.bench-yours.ok   { color: var(--verde); }
+.bench-yours.warn { color: var(--amarelo); }
+.bench-yours.crit { color: var(--vermelho); }
+.bench-track {
+  height: 7px; background: var(--superficie2);
+  border-radius: 4px; position: relative; overflow: visible;
+}
+.bench-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+.bench-fill.ok   { background: var(--verde); }
+.bench-fill.warn { background: var(--amarelo); }
+.bench-fill.crit { background: var(--vermelho); }
+.bench-median {
+  position: absolute; top: -3px;
+  width: 2px; height: 13px;
+  background: var(--textoSuave); border-radius: 1px;
+}
+.bench-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--textoSuave); margin-top: 3px; }
+
+/* Diagnosis box */
+.diag-box { border-radius: 10px; padding: 18px 22px; margin-top: 6px; border: 1px solid; }
+.diag-box.healthy  { background: var(--verdeDim);    border-color: var(--verde); }
+.diag-box.warning  { background: var(--amareloDim);  border-color: var(--amarelo); }
+.diag-box.critical { background: var(--vermelhoDim); border-color: var(--vermelho); }
+.diag-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px; font-weight: 700; margin-bottom: 6px;
+}
+.diag-text { font-size: 13px; line-height: 1.7; color: var(--textoMuted); }
+
+/* Scenarios */
+.scenarios-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.scenario-card {
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 10px; padding: 16px 18px;
+}
+.scenario-tag {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; margin-bottom: 8px;
+  display: inline-block; padding: 2px 7px; border-radius: 4px;
+}
+.scenario-tag.conservador { background: var(--vermelhoDim); color: var(--vermelho); }
+.scenario-tag.moderado    { background: var(--amareloDim);  color: var(--amarelo); }
+.scenario-tag.agressivo   { background: var(--verdeDim);    color: var(--verde); }
+.scenario-arr { font-family: 'Manrope', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 2px; }
+.scenario-growth { font-size: 12px; color: var(--textoMuted); margin-bottom: 10px; }
+.scenario-row { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; }
+.scenario-row span:first-child { color: var(--textoMuted); }
+.scenario-row span:last-child  { font-weight: 500; }
+
+/* Actions */
+.actions-list { display: flex; flex-direction: column; gap: 8px; }
+.action-item {
+  background: var(--superficie); border: 1px solid var(--borda);
+  border-radius: 8px; padding: 12px 16px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.action-icon {
+  width: 30px; height: 30px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.action-icon.vermelho { background: var(--vermelhoDim); }
+.action-icon.amarelo  { background: var(--amareloDim); }
+.action-icon.roxo     { background: var(--roxoDim); }
+.action-icon.verde    { background: var(--verdeDim); }
+.action-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.action-desc  { font-size: 12px; color: var(--textoMuted); line-height: 1.5; }
+
+/* Valuation */
+.val-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.val-card {
+  flex: 1; min-width: 120px;
+  background: var(--superficie); border: 1px solid var(--borda);
+  border-radius: 10px; padding: 14px 18px; text-align: center;
+}
+.val-multiple { font-size: 10px; color: var(--textoMuted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
+.val-amount   { font-family: 'Manrope', sans-serif; font-size: 20px; font-weight: 700; color: var(--roxo); }
+.val-cond     { font-size: 10px; color: var(--textoSuave); margin-top: 3px; }
+
+.divider { height: 1px; background: var(--borda); margin: 22px 0; }
+
+/* Alert adicional de validação */
+.validation-note {
+  background: var(--amareloDim); border: 1px solid var(--amarelo);
+  border-radius: 7px; padding: 10px 14px;
+  font-size: 12px; color: var(--texto); line-height: 1.5;
+  margin-bottom: 14px; display: none;
+}
+
+/* ── RESPONSIVE ──────────────────────────────── */
+@media (max-width: 860px) {
+  .app { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: static; padding: 20px; }
+  .steps { flex-direction: row; flex-wrap: wrap; }
+  .step-connector { display: none; }
+  .main { padding: 24px 20px; }
+  .form-grid, .form-grid.three { grid-template-columns: 1fr; }
+  .metrics-grid, .scenarios-grid { grid-template-columns: 1fr 1fr; }
+  .val-row { flex-wrap: wrap; }
+}
+@media (max-width: 520px) {
+  .metrics-grid, .scenarios-grid { grid-template-columns: 1fr; }
+}
+
+@media print {
+  .sidebar, .btn-row { display: none !important; }
+  .main { padding: 16px; }
+  .metric-card, .scenario-card, .action-item { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <span id="logo-nome">SaaS Health</span>
+      <span class="logo-badge">Beta</span>
+    </div>
+    <p class="logo-sub" id="logo-sub"></p>
+    <div class="steps" id="steps-nav"></div>
+    <div class="sidebar-footer" id="sidebar-footer"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── STEP 1 ── -->
+    <div class="screen active" id="screen-1">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+        <div class="progress-label">Passo 1 de 3</div>
+      </div>
+      <div class="step-eyebrow">Sobre a empresa</div>
+      <h1 class="step-heading">Vamos contextualizar sua operação</h1>
+      <p class="step-sub">Comece escolhendo o estágio e modelo de negócio. Depois preencha os dados de receita — use o slider para valores aproximados ou digite o número exato.</p>
+
+      <!-- Segmentações primeiro -->
+      <div class="section-label">Estágio & modelo</div>
+      <div class="form-grid">
+        <div class="field full">
+          <label class="field-label">Estágio da empresa</label>
+          <div class="seg-wrap" id="seg-estagio"></div>
+          <input type="hidden" id="input-estagio">
+        </div>
+        <div class="field full">
+          <label class="field-label">Modelo de go-to-market</label>
+          <div class="seg-wrap" id="seg-gtm"></div>
+          <input type="hidden" id="input-gtm">
+        </div>
+      </div>
+
+      <!-- Receita com abas de período -->
+      <div class="section-label">Receita recorrente</div>
+      <div class="period-tabs" id="period-tabs-1">
+        <button class="period-tab active" data-period="anual" onclick="setPeriod(this,'period-tabs-1','period-1')">Anual (ARR)</button>
+        <button class="period-tab" data-period="mensal" onclick="setPeriod(this,'period-tabs-1','period-1')">Mensal (MRR)</button>
+      </div>
+      <input type="hidden" id="period-1" value="anual">
+      <div class="form-grid">
+        <div class="field" id="field-arrAtual"></div>
+        <div class="field" id="field-arrAnterior"></div>
+      </div>
+
+      <!-- Dados opcionais -->
+      <div class="section-label">
+        Dados adicionais
+        <span class="optional-tag">opcional — melhoram o diagnóstico</span>
+      </div>
+      <div class="form-grid three">
+        <div class="field" id="field-ticketMedio"></div>
+        <div class="field" id="field-novosNegociosMes"></div>
+        <div class="field" id="field-tempoExistencia"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="goToStep(2)">Próximo — Aquisição →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 2 ── -->
+    <div class="screen" id="screen-2">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+        <div class="progress-label">Passo 2 de 3</div>
+      </div>
+      <div class="step-eyebrow">Aquisição de clientes</div>
+      <h1 class="step-heading">Como você está crescendo?</h1>
+      <p class="step-sub">Esses dados revelam a eficiência do seu motor de crescimento — quanto custa conquistar cada real de receita nova.</p>
+
+      <div class="period-tabs" id="period-tabs-2">
+        <button class="period-tab active" data-period="anual" onclick="setPeriod(this,'period-tabs-2','period-2')">Valores anuais</button>
+        <button class="period-tab" data-period="mensal" onclick="setPeriod(this,'period-tabs-2','period-2')">Valores mensais</button>
+      </div>
+      <input type="hidden" id="period-2" value="anual">
+
+      <div class="validation-note" id="nmrr-validation">
+        💡 Seus dados sugerem um NMRR de <strong id="nmrr-sugerido">—</strong> com base no ticket médio × novos negócios informados. Confira se o valor abaixo está alinhado.
+      </div>
+
+      <div class="form-grid">
+        <div class="field" id="field-cacTotal"></div>
+        <div class="field" id="field-nmrr"></div>
+        <div class="field" id="field-lifetime"></div>
+        <div class="field" id="field-taxaRetorno"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goToStep(1)">← Voltar</button>
+        <button class="btn btn-primary" onclick="goToStep(3)">Próximo — Eficiência →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 3 ── -->
+    <div class="screen" id="screen-3">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
+        <div class="progress-label">Passo 3 de 3</div>
+      </div>
+      <div class="step-eyebrow">Margens & retenção</div>
+      <h1 class="step-heading">Como está a saúde da sua base?</h1>
+      <p class="step-sub">Se não tiver certeza de algum número, use o slider para uma estimativa — o diagnóstico já será válido.</p>
+
+      <div class="form-grid">
+        <div class="field" id="field-margemBruta"></div>
+        <div class="field" id="field-ebitda"></div>
+        <div class="field" id="field-nrr"></div>
+        <div class="field" id="field-churn"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goToStep(1)">← Recomeçar</button>
+        <button class="btn btn-primary" onclick="calcular()">Gerar diagnóstico →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 4: RESULTADOS ── -->
+    <div class="screen" id="screen-4">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+        <div class="progress-label">Diagnóstico completo</div>
+      </div>
+
+      <div class="results-top">
+        <div>
+          <div class="step-eyebrow">Resultado</div>
+          <h1 class="step-heading" style="font-size:20px; margin-bottom:8px">Diagnóstico da sua startup</h1>
+          <div id="res-health-pill" class="health-pill critical">
+            <span class="health-dot"></span>
+            <span id="res-health-label">—</span>
+          </div>
+        </div>
+        <div class="btn-row" style="flex-wrap:wrap;">
+          <button class="btn btn-outline" onclick="window.print()">⬇ Exportar PDF</button>
+          <button class="link-btn" onclick="goToStep(1)">Refazer cálculo</button>
+        </div>
+      </div>
+
+      <div class="result-block">
+        <div class="block-title">Bloco 1 — Onde você está</div>
+        <div class="metrics-grid" id="block1-metrics"></div>
+        <div id="benchmark-bars"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="result-block">
+        <div class="block-title">Bloco 2 — O que seus números dizem</div>
+        <div class="metrics-grid" id="block2-metrics"></div>
+        <div id="diag-box"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="result-block">
+        <div class="block-title">Bloco 3 — Para onde ir</div>
+        <p style="font-size:13px;color:var(--textoMuted);margin-bottom:14px;">Projeção de ARR para os próximos 12 meses em três cenários, com base no seu perfil atual.</p>
+        <div class="scenarios-grid" id="scenarios-grid"></div>
+
+        <div style="margin-top:22px;">
+          <div class="block-title">Valuation implícito — múltiplo ARR privado</div>
+          <p style="font-size:12px;color:var(--textoMuted);margin-bottom:10px;">Referência de mercado 2025–2026 para empresas privadas de SaaS no seu estágio.</p>
+          <div class="val-row" id="val-row"></div>
+        </div>
+
+        <div style="margin-top:22px;">
+          <div class="block-title">Alavancas prioritárias</div>
+          <div class="actions-list" id="actions-list"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script type="module">
+import {
+  identidade, cores, campos, opcoes,
+  benchmarks, cenarios, multiplos,
+  diagnosticos, alavancas
+} from './config.js';
+
+// ── CSS VARS ──────────────────────────────────────────────
+document.getElementById('theme-vars').textContent =
+  `:root{${Object.entries(cores).map(([k,v])=>`--${k}:${v}`).join(';')}}`;
+
+// ── IDENTIDADE ────────────────────────────────────────────
+document.title = identidade.nomeProduto + ' — The Beatstrap';
+document.getElementById('logo-nome').textContent = identidade.nomeProduto;
+document.getElementById('logo-sub').textContent  = identidade.subtitulo;
+document.getElementById('sidebar-footer').textContent = identidade.rodape;
+
+// ── STEPS NAV ─────────────────────────────────────────────
+const stepsConfig = [
+  { title:'Sua empresa',  desc:'Receita e contexto'        },
+  { title:'Aquisição',    desc:'CAC e novas receitas'      },
+  { title:'Eficiência',   desc:'Margens e retenção'        },
+  { title:'Diagnóstico',  desc:'Seu painel completo'       },
+];
+const nav = document.getElementById('steps-nav');
+stepsConfig.forEach((s,i) => {
+  if (i>0) nav.insertAdjacentHTML('beforeend','<div class="step-connector"></div>');
+  nav.insertAdjacentHTML('beforeend',`
+    <div class="step-item${i===0?' active':''}" id="nav-${i+1}" onclick="window._go(${i+1})">
+      <div class="step-num">
+        <span class="step-num-digit">${i+1}</span>
+        <span class="step-num-check">✓</span>
+      </div>
+      <div>
+        <div class="step-title">${s.title}</div>
+        <div class="step-desc">${s.desc}</div>
+      </div>
+    </div>`);
+});
+
+// ── RENDER CAMPOS ─────────────────────────────────────────
+function renderField(id, key, prefix='') {
+  const el = document.getElementById('field-'+key);
+  if (!el) return;
+  const c = campos[key];
+  const hasPrefix = !!prefix;
+  const hasSufixo = !!c.sufixo;
+
+  el.innerHTML = `
+    <label class="field-label">
+      ${c.label}
+      <span class="tip">?<span class="tip-text">${c.tooltip}</span></span>
+    </label>
+    <div class="input-group">
+      <div class="input-row">
+        ${hasPrefix ? `<span class="input-prefix">${prefix}</span>` : ''}
+        <input type="number"
+          id="input-${key}"
+          placeholder="${c.placeholder}"
+          value="${c.padrao ?? ''}"
+          step="any"
+        >
+        ${hasSufixo ? `<span class="input-suffix">${c.sufixo}</span>` : ''}
+      </div>
+      <div class="slider-row">
+        <input type="range"
+          id="slider-${key}"
+          min="${c.sliderMin ?? 0}"
+          max="${c.sliderMax ?? 100}"
+          step="${c.sliderStep ?? 1}"
+          value="${c.padrao ?? 0}"
+        >
+        <span class="slider-val" id="sliderval-${key}">${fmtSlider(key, c.padrao ?? 0, prefix)}</span>
+      </div>
+    </div>
+    <span class="field-hint">${c.hint}</span>`;
+
+  // Sync slider ↔ input
+  const inp = document.getElementById('input-'+key);
+  const sld = document.getElementById('slider-'+key);
+  const val = document.getElementById('sliderval-'+key);
+
+  inp.addEventListener('input', () => {
+    const v = parseFloat(inp.value);
+    if (!isNaN(v)) {
+      sld.value = Math.min(c.sliderMax, Math.max(c.sliderMin ?? 0, v));
+      val.textContent = fmtSlider(key, v, prefix);
+    }
+    if (key==='ticketMedio' || key==='novosNegociosMes') sugerirNMRR();
+  });
+  sld.addEventListener('input', () => {
+    inp.value = sld.value;
+    val.textContent = fmtSlider(key, parseFloat(sld.value), prefix);
+    if (key==='ticketMedio' || key==='novosNegociosMes') sugerirNMRR();
+  });
+}
+
+function fmtSlider(key, v, prefix) {
+  const c = campos[key];
+  const n = parseFloat(v) || 0;
+  const formatted = prefix
+    ? prefix + ' ' + fmtM(n)
+    : n.toLocaleString('pt-BR') + (c.sufixo ? ' ' + c.sufixo : '');
+  return formatted;
+}
+
+// Step 1
+renderField('field-arrAtual',       'arrAtual',       'R$');
+renderField('field-arrAnterior',    'arrAnterior',    'R$');
+renderField('field-ticketMedio',    'ticketMedio',    'R$');
+renderField('field-novosNegociosMes','novosNegociosMes','');
+renderField('field-tempoExistencia','tempoExistencia','');
+
+// Step 2
+renderField('field-cacTotal',    'cacTotal',    'R$');
+renderField('field-nmrr',        'nmrr',        'R$');
+renderField('field-lifetime',    'lifetime',    '');
+renderField('field-taxaRetorno', 'taxaRetorno', '');
+
+// Step 3
+renderField('field-margemBruta', 'margemBruta', '');
+renderField('field-ebitda',      'ebitda',      '');
+renderField('field-nrr',         'nrr',         '');
+renderField('field-churn',       'churn',       '');
+
+// ── SEGMENTED BUTTONS ─────────────────────────────────────
+function renderSeg(wrapId, key, opts) {
+  const wrap = document.getElementById(wrapId);
+  if (!wrap) return;
+  wrap.innerHTML = opts.map((o,i) =>
+    `<button class="seg-btn${i===0?' active':''}" data-val="${o.val}"
+      onclick="window._seg(this,'${wrapId}','input-${key}')">${o.label}</button>`
+  ).join('');
+  document.getElementById('input-'+key).value = opts[0].val;
+}
+renderSeg('seg-estagio', 'estagio', opcoes.estagio);
+renderSeg('seg-gtm',     'gtm',     opcoes.gtm);
+
+window._seg = function(btn, wrapId, inputId) {
+  document.querySelectorAll('#'+wrapId+' .seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(inputId).value = btn.dataset.val;
+};
+
+// ── PERIOD TABS ───────────────────────────────────────────
+window.setPeriod = function(btn, tabsId, hiddenId) {
+  document.querySelectorAll('#'+tabsId+' .period-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(hiddenId).value = btn.dataset.period;
+};
+
+// ── SUGESTÃO DE NMRR ──────────────────────────────────────
+function sugerirNMRR() {
+  const ticket = getVal('ticketMedio');
+  const novos  = getVal('novosNegociosMes');
+  if (ticket > 0 && novos > 0) {
+    const sugerido = (ticket / 12) * novos;
+    document.getElementById('nmrr-sugerido').textContent = fmtM(sugerido) + '/mês';
+    document.getElementById('nmrr-validation').style.display = 'block';
+  } else {
+    document.getElementById('nmrr-validation').style.display = 'none';
+  }
+}
+
+// ── STATE & COLETA ────────────────────────────────────────
+const state = {};
+
+function getVal(key, def) {
+  const el = document.getElementById('input-'+key);
+  const v  = parseFloat(el?.value);
+  return isNaN(v) ? (def ?? campos[key]?.padrao ?? 0) : v;
+}
+
+function collectAll() {
+  const p1 = document.getElementById('period-1').value;
+  const p2 = document.getElementById('period-2').value;
+
+  state.estagio  = document.getElementById('input-estagio').value;
+  state.gtm      = document.getElementById('input-gtm').value;
+
+  // Receita — normaliza para anual
+  state.arrAtual    = getVal('arrAtual')    * (p1==='mensal' ? 12 : 1);
+  state.arrAnterior = getVal('arrAnterior') * (p1==='mensal' ? 12 : 1);
+
+  // Opcionais
+  state.ticketMedio       = getVal('ticketMedio',       0);
+  state.novosNegociosMes  = getVal('novosNegociosMes',  0);
+  state.tempoExistencia   = getVal('tempoExistencia',   0);
+
+  // Aquisição — normaliza para anual/mensal conforme campo
+  state.cacTotal    = getVal('cacTotal')    * (p2==='mensal' ? 12 : 1);
+  state.nmrr        = getVal('nmrr')        * (p2==='mensal' ? 1  : 1/12); // NMRR sempre mensal internamente
+  state.lifetime    = getVal('lifetime',    24);
+  state.taxaRetorno = getVal('taxaRetorno', 12);
+
+  // Eficiência
+  state.margemBruta = getVal('margemBruta', 75);
+  state.ebitda      = getVal('ebitda',      -20);
+  state.nrr         = getVal('nrr',         101);
+  state.churn       = getVal('churn',       2);
+}
+
+// ── NAVIGATION ────────────────────────────────────────────
+let cur = 1;
+function goToStep(n) {
+  collectAll();
+  cur = n;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+n).classList.add('active');
+  for (let i=1;i<=4;i++) {
+    const el = document.getElementById('nav-'+i);
+    if (!el) continue;
+    el.classList.remove('active','done');
+    if (i===n) el.classList.add('active');
+    else if (i<n) el.classList.add('done');
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+window._go      = goToStep;
+window.goToStep = goToStep;
+
+// ── CÁLCULOS ─────────────────────────────────────────────
+window.calcular = function() {
+  collectAll();
+  const s = state;
+  const rateM  = Math.pow(1 + s.taxaRetorno/100, 1/12) - 1;
+  const margin = s.margemBruta / 100;
+
+  const growthRate = s.arrAnterior > 0
+    ? (s.arrAtual - s.arrAnterior) / s.arrAnterior * 100 : 0;
+  const rule40 = growthRate + s.ebitda;
+
+  let af = 0;
+  for (let t=1; t<=s.lifetime; t++) af += 1/Math.pow(1+rateM,t);
+
+  const ltvNom   = s.nmrr * s.lifetime * margin;
+  const ltvDesc  = s.nmrr * margin * af * 12;
+  const retExig  = s.cacTotal * (Math.pow(1+rateM, s.lifetime) - 1);
+  const vpl      = ltvDesc - s.cacTotal - retExig;
+  const cacMensal= s.cacTotal / 12;
+  const ltvcac   = cacMensal > 0 ? ltvNom / cacMensal : 0;
+  const payback  = s.nmrr > 0 ? s.cacTotal / (s.nmrr * margin) : 999;
+  const smRatio  = s.arrAtual > 0 ? s.cacTotal / s.arrAtual * 100 : 0;
+
+  // Score
+  let score = 0;
+  const bm = benchmarks;
+  if (growthRate >= bm.crescimento.limites.ok)   score+=2; else if (growthRate >= bm.crescimento.limites.warn) score+=1;
+  if (rule40     >= bm.rule40.limites.ok)         score+=2; else if (rule40     >= bm.rule40.limites.warn)    score+=1;
+  if (payback    <= bm.payback.limites.ok)        score+=2; else if (payback    <= bm.payback.limites.warn)   score+=1;
+  if (ltvcac     >= bm.ltvcac.limites.ok)         score+=2; else if (ltvcac     >= bm.ltvcac.limites.warn)    score+=1;
+  if (s.nrr      >= bm.nrr.limites.ok)            score+=2; else if (s.nrr      >= bm.nrr.limites.warn)      score+=1;
+
+  const health = score>=7 ? 'healthy' : score>=4 ? 'warning' : 'critical';
+  render({ s, growthRate, rule40, payback, ltvcac, ltvDesc, vpl, smRatio, health });
+  goToStep(4);
+};
+
+// ── RENDER ────────────────────────────────────────────────
+function render(c) {
+  const { s, growthRate, rule40, payback, ltvcac, ltvDesc, vpl, smRatio, health } = c;
+
+  // Pill
+  const pill = document.getElementById('res-health-pill');
+  pill.className = 'health-pill ' + health;
+  document.getElementById('res-health-label').textContent = diagnosticos[health].badgeLabel;
+
+  // Block 1 — posição
+  document.getElementById('block1-metrics').innerHTML = [
+    mCard('Taxa de crescimento YoY', fmtN(growthRate,1)+'%',
+      cls(growthRate, benchmarks.crescimento.limites, false),
+      `Mediana mercado: ${benchmarks.crescimento.mediana}%`,
+      growthRate >= 65 ? 'Top quartil. Crescimento expressivo para o segmento.'
+      : growthRate >= 25 ? 'Na mediana do mercado. Há espaço para acelerar.'
+      : 'Abaixo da mediana. Investigue o gargalo de crescimento.'),
+    mCard('Rule of 40', (rule40>=0?'+':'')+fmtN(rule40,0),
+      cls(rule40, benchmarks.rule40.limites, false),
+      `Benchmark saudável: ≥ ${benchmarks.rule40.limites.ok}`,
+      rule40>=40 ? 'Excelente equilíbrio crescimento × lucratividade.'
+      : rule40>=20 ? 'Razoável. Objetivo: atingir 40.'
+      : 'Abaixo do esperado. Reveja burn rate ou acelere receita.'),
+    mCard('S&M / ARR', fmtN(smRatio,1)+'%',
+      smRatio<=benchmarks.smRatio.limites.ok ? 'ok' : smRatio<=benchmarks.smRatio.limites.warn ? 'warn' : 'crit',
+      `VC-backed eficiente: < ${benchmarks.smRatio.vcBacked}%`,
+      smRatio<=33 ? 'Eficiência acima da média.'
+      : smRatio<=47 ? 'Dentro do esperado para VC-backed.'
+      : 'Alto. Reavalie o retorno de cada canal.'),
+  ].join('');
+
+  document.getElementById('benchmark-bars').innerHTML = [
+    bBar(benchmarks.crescimento, growthRate),
+    bBar(benchmarks.nrr, s.nrr),
+    bBar(benchmarks.churn, s.churn),
+  ].join('');
+
+  // Block 2 — métricas
+  document.getElementById('block2-metrics').innerHTML = [
+    mCard('CAC Payback', payback>900?'∞':Math.round(payback)+'m',
+      payback<=benchmarks.payback.limites.ok ? 'ok' : payback<=benchmarks.payback.limites.warn ? 'warn' : 'crit',
+      `Benchmark: ${benchmarks.payback.limites.ok}–${benchmarks.payback.limites.warn} meses`,
+      payback<=18 ? 'Payback dentro do ideal. Capital eficiente.'
+      : payback<=30 ? 'Aceitável, mas acima do ideal.'
+      : 'Crítico. Capital demorando muito para retornar.'),
+    mCard('LTV/CAC', fmtN(ltvcac,1)+'×',
+      cls(ltvcac, benchmarks.ltvcac.limites, false),
+      `Benchmark mínimo: ${benchmarks.ltvcac.limites.ok}×`,
+      ltvcac>=3 ? 'Excelente. Cliente gera 3× o custo de aquisição.'
+      : ltvcac>=1 ? 'O cliente cobre o CAC, mas a margem é estreita.'
+      : 'O CAC não está sendo recuperado.'),
+    mCard('VPL da coorte', vpl>=0 ? '+'+fmtM(vpl) : fmtM(vpl),
+      vpl>=0 ? 'ok' : 'crit',
+      `Taxa mínima: ${s.taxaRetorno}% a.a.`,
+      vpl>=0 ? `O investimento supera o custo de oportunidade de ${s.taxaRetorno}% a.a.`
+             : `O retorno não supera ${s.taxaRetorno}% a.a. Reveja a alocação de CAC.`),
+  ].join('');
+
+  // Diagnosis
+  const d = diagnosticos[health];
+  const txt = d.texto
+    .replace('{growthRate}', fmtN(growthRate,1))
+    .replace('{rule40}', fmtN(rule40,0))
+    .replace('{payback}', Math.round(payback))
+    .replace('{ltvcac}', fmtN(ltvcac,1));
+  document.getElementById('diag-box').innerHTML = `
+    <div class="diag-box ${health}">
+      <div class="diag-title">${d.titulo}</div>
+      <div class="diag-text">${txt}</div>
+    </div>`;
+
+  // Cenários
+  document.getElementById('scenarios-grid').innerHTML = cenarios.map(cn => `
+    <div class="scenario-card">
+      <span class="scenario-tag ${cn.id}">${cn.label}</span>
+      <div class="scenario-arr">${fmtM(s.arrAtual*(1+cn.taxa))}</div>
+      <div class="scenario-growth">+${Math.round(cn.taxa*100)}% de crescimento</div>
+      <div class="scenario-row"><span>ARR adicional</span><span>${fmtM(s.arrAtual*cn.taxa)}</span></div>
+      <div class="scenario-row"><span>NMRR/mês necessário</span><span>${fmtM(s.arrAtual*cn.taxa/12)}</span></div>
+      <div class="scenario-row"><span>Referência</span><span>${cn.referencia}</span></div>
+    </div>`).join('');
+
+  // Valuation
+  document.getElementById('val-row').innerHTML = multiplos.map(v => `
+    <div class="val-card">
+      <div class="val-multiple">${v.label}</div>
+      <div class="val-amount">${fmtM(s.arrAtual*v.multiplo)}</div>
+      <div class="val-cond">${v.condicao}</div>
+    </div>`).join('');
+
+  // Alavancas
+  const res = { payback, ltvcac, crescimento: growthRate, rule40 };
+  const ativas = alavancas.filter(a => {
+    if (a.condicao==='saudavel') return false;
+    return evalCond(a.condicao, res);
+  });
+  const lista = ativas.length ? ativas : [alavancas.find(a=>a.condicao==='saudavel')];
+  document.getElementById('actions-list').innerHTML = lista.filter(Boolean).map(a => `
+    <div class="action-item">
+      <div class="action-icon ${a.cor}">${a.icone}</div>
+      <div>
+        <div class="action-title">${a.titulo}</div>
+        <div class="action-desc">${a.descricao}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── HELPERS ──────────────────────────────────────────────
+function mCard(label, value, status, bench, diag) {
+  return `<div class="metric-card ${status}">
+    <div class="metric-label">${label}</div>
+    <div class="metric-value">${value}</div>
+    <div class="metric-bench">${bench}</div>
+    <div class="metric-diagnosis">${diag}</div>
+  </div>`;
+}
+
+function bBar(cfg, value) {
+  const min=cfg.min??0, max=cfg.max??100;
+  const pct = Math.min(100,Math.max(2,(value-min)/(max-min)*100));
+  const mPct = cfg.mediana ? (cfg.mediana-min)/(max-min)*100 : 50;
+  const status = cfg.lowerIsBetter
+    ? (value<=cfg.limites.ok?'ok':value<=cfg.limites.warn?'warn':'crit')
+    : (value>=cfg.limites.ok?'ok':value>=cfg.limites.warn?'warn':'crit');
+  return `<div class="bench-item">
+    <div class="bench-top">
+      <span class="bench-name">${cfg.label}</span>
+      <span class="bench-yours ${status}">${fmtN(value,1)}${cfg.unidade} (você)</span>
+    </div>
+    <div class="bench-track">
+      <div class="bench-fill ${status}" style="width:${pct}%"></div>
+      ${cfg.mediana?`<div class="bench-median" style="left:${mPct}%"></div>`:''}
+    </div>
+    <div class="bench-labels">
+      <span>${min}${cfg.unidade}</span>
+      ${cfg.mediana?`<span>▲ mediana: ${cfg.mediana}${cfg.unidade}</span>`:'<span></span>'}
+      <span>${max}${cfg.unidade}</span>
+    </div>
+  </div>`;
+}
+
+function cls(v, limites, lowerIsBetter) {
+  if (lowerIsBetter) return v<=limites.ok?'ok':v<=limites.warn?'warn':'crit';
+  return v>=limites.ok?'ok':v>=limites.warn?'warn':'crit';
+}
+
+function evalCond(cond, res) {
+  const [k,op,v] = cond.split(' ');
+  const n = parseFloat(v), r = res[k];
+  if (op==='>') return r>n;
+  if (op==='<') return r<n;
+  return false;
+}
+
+function fmtN(n,d) { return (n<0?'−':'')+Math.abs(n).toFixed(d); }
+function fmtM(n) {
+  const s=n<0?'−':'', a=Math.abs(n);
+  if(a>=1e9) return s+'R$ '+(a/1e9).toFixed(1)+'B';
+  if(a>=1e6) return s+'R$ '+(a/1e6).toFixed(1)+'M';
+  if(a>=1e3) return s+'R$ '+(a/1e3).toFixed(0)+'k';
+  return s+'R$ '+Math.round(a).toLocaleString('pt-BR');
+}
+</script>
+</body>
+</html>
