@@ -1073,6 +1073,21 @@ function fmtM(n) {
   if(a>=1e3) return s+'R$ '+(a/1e3).toFixed(0)+'k';
   return s+'R$ '+Math.round(a).toLocaleString('pt-BR');
 }
+
+// Recebe dados do usuário da página mãe
+window.addEventListener('message', function(event) {
+  if (event.origin !== 'https://the.beatstrap.com.br') return;
+  if (!event.data || event.data.tipo !== 'dados-usuario') return;
+
+  state.usuario = {
+    nome:    event.data.nome,
+    email:   event.data.email,
+    empresa: event.data.empresa
+  };
+
+  console.log('Dados recebidos:', state.usuario);
+});
+
 </script>
 </body>
 </html>
