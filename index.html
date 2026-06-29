@@ -908,6 +908,25 @@ window.calcular = function() {
 
   const health = score>=7 ? 'healthy' : score>=4 ? 'warning' : 'critical';
   render({ s, growthRate, rule40, payback, ltvcac, ltvDesc, vpl, smRatio, health });
+
+  // ── Envia para a planilha na primeira execução ──
+  const usuario = lerDadosUsuario();
+  enviarParaPlanilha({
+    nome:        usuario.nome,
+    email:       usuario.email,
+    empresa:     usuario.empresa,
+    cargo:       usuario.cargo,
+    estagio:     s.estagio,
+    gtm:         s.gtm,
+    arrAtual:    s.arrAtual,
+    arrAnterior: s.arrAnterior,
+    crescimento: fmtN(growthRate, 1) + '%',
+    cac:         s.cacTotal,
+    nmrr:        s.nmrr,
+    payback:     Math.round(payback),
+    health:      health
+  });
+
   goToStep(4);
 };
 
@@ -1074,47 +1093,45 @@ function fmtM(n) {
   return s+'R$ '+Math.round(a).toLocaleString('pt-BR');
 }
 
-// Avisa a página mãe que está pronto — tenta várias vezes
-var tentativas = 0;
-var avisar = setInterval(function() {
-  window.parent.postMessage({ tipo: 'iframe-pronto' }, 'https://the.beatstrap.com.br');
-  tentativas++;
-  if (tentativas >= 10) clearInterval(avisar);
-}, 300);
+// ── LEITURA DE PARÂMETROS DA URL DA PÁGINA MÃE ──────────────
+// Lê os dados do formulário Elementor passados via URL
+// Funciona porque iframe e página mãe estão no mesmo domínio (the.beatstrap.com.br)
+function lerDadosUsuario() {
+  try {
+    const params = new URLSearchParams(window.parent.location.search);
+    return {
+      nome:    params.get('nome')    || '',
+      email:   params.get('email')   || '',
+      empresa: params.get('empresa') || '',
+      cargo:   params.get('cargo')   || ''
+    };
+  } catch(e) {
+    // Acesso negado (origens diferentes) — retorna vazio sem erro
+    return { nome: '', email: '', empresa: '', cargo: '' };
+  }
+}
 
-// Recebe dados do usuário da página mãe
-window.addEventListener('message', function(event) {
-  console.log('postMessage recebido de:', event.origin, event.data);
-  if (event.origin !== 'https://the.beatstrap.com.br') return;
-  if (!event.data || event.data.tipo !== 'dados-usuario') return;
+// ── ENVIO PARA GOOGLE SHEETS ─────────────────────────────────
+const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx39wbURgYGJeDSN1-DWOdAiLzbgZHV73mUqwPXFxo3ZIwfKH6tw7wv5A_cJ6CdfquN/exec';
 
-  clearInterval(avisar);
+function enviarParaPlanilha(dados) {
+  // Só envia se tiver nome e email — sem identificação, não registra
+  if (!dados.nome || !dados.email) return;
 
-  state.usuario = {
-    nome:    event.data.nome,
-    email:   event.data.email,
-    empresa: event.data.empresa
-  };
+  // Só envia uma vez por sessão
+  if (sessionStorage.getItem('bs_enviado')) return;
+  sessionStorage.setItem('bs_enviado', '1');
 
-  console.log('Dados recebidos:', state.usuario);
-});
-
-// Para de avisar quando receber os dados
-window.addEventListener('message', function(event) {
-  console.log('postMessage recebido de:', event.origin, event.data);
-  if (event.origin !== 'https://the.beatstrap.com.br') return;
-  if (!event.data || event.data.tipo !== 'dados-usuario') return;
-
-  clearInterval(avisar);
-
-  state.usuario = {
-    nome:    event.data.nome,
-    email:   event.data.email,
-    empresa: event.data.empresa
-  };
-
-  console.log('Dados recebidos:', state.usuario);
-});
+  fetch(WEBHOOK_URL, {
+    method: 'POST',
+    mode:   'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados)
+  }).catch(function() {
+    // Falha silenciosa — não interrompe o diagnóstico
+    sessionStorage.removeItem('bs_enviado');
+  });
+}
 
 </script>
 </body>
