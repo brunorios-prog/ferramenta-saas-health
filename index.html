@@ -1090,6 +1090,11 @@ window.addEventListener('message', function(event) {
   console.log('Dados recebidos:', state.usuario);
 });
 
+// Avisa a página mãe que o iframe está pronto para receber dados
+window.addEventListener('load', function() {
+  window.parent.postMessage({ tipo: 'iframe-pronto' }, 'https://the.beatstrap.com.br');
+});
+
 </script>
 </body>
 </html>
