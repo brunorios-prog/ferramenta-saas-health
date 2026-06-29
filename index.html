@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SaaS Health — The Beatstrap</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style id="theme-vars">/* injetado via JS */</style>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1076,6 +1076,8 @@ function fmtM(n) {
 
 // Recebe dados do usuário da página mãe
 window.addEventListener('message', function(event) {
+  console.log('postMessage recebido de:', event.origin, event.data);
+
   if (event.origin !== 'https://the.beatstrap.com.br') return;
   if (!event.data || event.data.tipo !== 'dados-usuario') return;
 
