@@ -907,27 +907,33 @@ window.calcular = function() {
   if (s.nrr      >= bm.nrr.limites.ok)            score+=2; else if (s.nrr      >= bm.nrr.limites.warn)      score+=1;
 
   const health = score>=7 ? 'healthy' : score>=4 ? 'warning' : 'critical';
-  render({ s, growthRate, rule40, payback, ltvcac, ltvDesc, vpl, smRatio, health });
+render({ s, growthRate, rule40, payback, ltvcac, ltvDesc, vpl, smRatio, health });
 
-  // ── Envia para a planilha na primeira execução ──
-  const usuario = lerDadosUsuario();
-  enviarParaPlanilha({
-    nome:        usuario.nome,
-    email:       usuario.email,
-    empresa:     usuario.empresa,
-    cargo:       usuario.cargo,
-    estagio:     s.estagio,
-    gtm:         s.gtm,
-    arrAtual:    s.arrAtual,
-    arrAnterior: s.arrAnterior,
-    crescimento: fmtN(growthRate, 1) + '%',
-    cac:         s.cacTotal,
-    nmrr:        s.nmrr,
-    payback:     Math.round(payback),
-    health:      health
-  });
+console.log('CHEGOU ANTES DO ENVIO');
 
-  goToStep(4);
+// ── Envia para a planilha na primeira execução ──
+const usuario = lerDadosUsuario();
+console.log('USUARIO LIDO:', usuario);
+
+enviarParaPlanilha({
+  nome:        usuario.nome,
+  email:       usuario.email,
+  empresa:     usuario.empresa,
+  cargo:       usuario.cargo,
+  estagio:     s.estagio,
+  gtm:         s.gtm,
+  arrAtual:    s.arrAtual,
+  arrAnterior: s.arrAnterior,
+  crescimento: fmtN(growthRate, 1) + '%',
+  cac:         s.cacTotal,
+  nmrr:        s.nmrr,
+  payback:     Math.round(payback),
+  health:      health
+});
+
+console.log('CHAMOU enviarParaPlanilha');
+
+goToStep(4);
 };
 
 // ── RENDER ────────────────────────────────────────────────
