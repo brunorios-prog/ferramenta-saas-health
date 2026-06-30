@@ -1098,7 +1098,7 @@ function fmtM(n) {
 // Funciona porque iframe e página mãe estão no mesmo domínio (the.beatstrap.com.br)
 function lerDadosUsuario() {
   try {
-    const params = new URLSearchParams(window.parent.location.search);
+    const params = new URLSearchParams(window.location.search);
     return {
       nome:    params.get('nome')    || '',
       email:   params.get('email')   || '',
