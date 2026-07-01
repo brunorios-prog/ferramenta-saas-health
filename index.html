@@ -116,6 +116,12 @@ body {
   color: var(--texto); line-height: 1.2; margin-bottom: 6px;
 }
 .step-sub { font-size: 14px; color: var(--textoMuted); max-width: 540px; margin-bottom: 28px; }
+.step-tip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; color: var(--textoMuted); font-style: italic;
+  background: var(--roxoDim); border: 1px solid rgba(91,79,232,0.18);
+  border-radius: 6px; padding: 4px 10px; margin-bottom: 24px;
+}
 
 /* ── PERIOD TABS ──────────────────────────────── */
 .period-tabs {
@@ -163,8 +169,8 @@ body {
 /* Tooltip */
 .tip {
   width: 15px; height: 15px; border-radius: 50%;
-  background: var(--superficie2); border: 1px solid var(--borda);
-  color: var(--textoMuted); font-size: 9px; font-weight: 700;
+  background: var(--roxoDim); border: 1px solid var(--roxo);
+  color: var(--roxo); font-size: 9px; font-weight: 700;
   display: inline-flex; align-items: center; justify-content: center;
   cursor: help; position: relative; flex-shrink: 0;
 }
@@ -176,7 +182,7 @@ body {
   background: var(--texto); color: var(--fundo);
   border-radius: 7px; padding: 8px 12px;
   font-size: 12px; font-weight: 400;
-  white-space: normal; max-width: 220px;
+  white-space: normal; max-width: 320px;
   text-transform: none; letter-spacing: 0;
   z-index: 200; line-height: 1.5;
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
@@ -210,7 +216,8 @@ body {
   border-right: none; border-left: 1px solid var(--borda);
 }
 
-input[type="number"] {
+input[type="number"],
+input[type="text"] {
   flex: 1; width: 100%; min-width: 0;
   background: transparent; border: none; outline: none;
   padding: 10px 12px;
@@ -219,7 +226,8 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-input[type="number"]::placeholder { color: var(--textoSuave); font-weight: 400; }
+input[type="number"]::placeholder,
+input[type="text"]::placeholder { color: var(--textoSuave); font-weight: 400; }
 
 /* Slider */
 .slider-row {
@@ -493,7 +501,8 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
       </div>
       <div class="step-eyebrow">Sobre a empresa</div>
       <h1 class="step-heading">Vamos contextualizar sua operação</h1>
-      <p class="step-sub">Comece escolhendo o estágio e modelo de negócio. Depois preencha os dados de receita — use o slider para valores aproximados ou digite o número exato.</p>
+      <p class="step-sub" style="margin-bottom:8px">Comece escolhendo o estágio e modelo de negócio. Depois preencha os dados de receita.</p>
+      <p class="step-tip">💡 Use o slider para valores aproximados ou digite o número exato.</p>
 
       <!-- Segmentações primeiro -->
       <div class="section-label">Estágio & modelo</div>
@@ -700,20 +709,22 @@ function renderField(id, key, prefix='') {
   const c = campos[key];
   const hasPrefix = !!prefix;
   const hasSufixo = !!c.sufixo;
+  const isMoney = prefix === 'R$';
+  const initVal = isMoney ? fmtMoneyInput(c.padrao ?? 0) : (c.padrao ?? '');
 
   el.innerHTML = `
     <label class="field-label">
-      ${c.label}
+      <span id="label-text-${key}">${c.label}</span>
       <span class="tip">?<span class="tip-text">${c.tooltip}</span></span>
     </label>
     <div class="input-group">
       <div class="input-row">
         ${hasPrefix ? `<span class="input-prefix">${prefix}</span>` : ''}
-        <input type="number"
+        <input type="${isMoney ? 'text' : 'number'}"
           id="input-${key}"
           placeholder="${c.placeholder}"
-          value="${c.padrao ?? ''}"
-          step="any"
+          value="${initVal}"
+          ${isMoney ? 'inputmode="numeric" autocomplete="off"' : 'step="any"'}
         >
         ${hasSufixo ? `<span class="input-suffix">${c.sufixo}</span>` : ''}
       </div>
@@ -728,15 +739,26 @@ function renderField(id, key, prefix='') {
         <span class="slider-val" id="sliderval-${key}">${fmtSlider(key, c.padrao ?? 0, prefix)}</span>
       </div>
     </div>
-    <span class="field-hint">${c.hint}</span>`;
+    <span class="field-hint" id="hint-text-${key}">${c.hint}</span>`;
 
   // Sync slider ↔ input
   const inp = document.getElementById('input-'+key);
   const sld = document.getElementById('slider-'+key);
   const val = document.getElementById('sliderval-'+key);
 
+  if (isMoney) {
+    inp.addEventListener('focus', () => {
+      const n = parseMoneyInput(inp.value);
+      inp.value = n ? String(n) : '';
+    });
+    inp.addEventListener('blur', () => {
+      const n = parseMoneyInput(inp.value);
+      inp.value = n ? fmtMoneyInput(n) : '';
+    });
+  }
+
   inp.addEventListener('input', () => {
-    const v = parseFloat(inp.value);
+    const v = isMoney ? parseMoneyInput(inp.value) : parseFloat(inp.value);
     if (!isNaN(v)) {
       sld.value = Math.min(c.sliderMax, Math.max(c.sliderMin ?? 0, v));
       val.textContent = fmtSlider(key, v, prefix);
@@ -744,15 +766,25 @@ function renderField(id, key, prefix='') {
     if (key==='ticketMedio' || key==='novosNegociosMes') sugerirNMRR();
   });
   sld.addEventListener('input', () => {
-    inp.value = sld.value;
-    val.textContent = fmtSlider(key, parseFloat(sld.value), prefix);
+    const n = parseFloat(sld.value);
+    inp.value = isMoney ? fmtMoneyInput(n) : sld.value;
+    val.textContent = fmtSlider(key, n, prefix);
     if (key==='ticketMedio' || key==='novosNegociosMes') sugerirNMRR();
   });
+}
+
+function fmtMoneyInput(n) {
+  return Math.round(parseFloat(n) || 0).toLocaleString('pt-BR');
+}
+
+function parseMoneyInput(str) {
+  return parseFloat((str || '').replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '').trim()) || 0;
 }
 
 function fmtSlider(key, v, prefix) {
   const c = campos[key];
   const n = parseFloat(v) || 0;
+  if (prefix === 'R$') return 'R$ ' + Math.round(n).toLocaleString('pt-BR');
   const formatted = prefix
     ? prefix + ' ' + fmtM(n)
     : n.toLocaleString('pt-BR') + (c.sufixo ? ' ' + c.sufixo : '');
@@ -802,7 +834,22 @@ window.setPeriod = function(btn, tabsId, hiddenId) {
   document.querySelectorAll('#'+tabsId+' .period-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById(hiddenId).value = btn.dataset.period;
+  if (tabsId === 'period-tabs-1') updateRevLabels(btn.dataset.period);
 };
+
+function updateRevLabels(period) {
+  const isAnual = period === 'anual';
+  const sets = [
+    { key: 'arrAtual',    lbl: isAnual ? 'Receita anual atual (ARR)'    : 'Receita mensal atual (MRR)',    hint: isAnual ? 'ARR — receita recorrente anual'   : 'MRR — receita recorrente mensal' },
+    { key: 'arrAnterior', lbl: isAnual ? 'Receita anual há 12 meses'    : 'Receita mensal há 12 meses',   hint: isAnual ? 'Mesmo período do ano anterior'    : 'Mesmo mês do ano anterior' },
+  ];
+  sets.forEach(({ key, lbl, hint }) => {
+    const l = document.getElementById('label-text-' + key);
+    const h = document.getElementById('hint-text-' + key);
+    if (l) l.textContent = lbl;
+    if (h) h.textContent = hint;
+  });
+}
 
 // ── SUGESTÃO DE NMRR ──────────────────────────────────────
 function sugerirNMRR() {
@@ -822,7 +869,8 @@ const state = {};
 
 function getVal(key, def) {
   const el = document.getElementById('input-'+key);
-  const v  = parseFloat(el?.value);
+  if (!el) return def ?? campos[key]?.padrao ?? 0;
+  const v = el.type === 'text' ? parseMoneyInput(el.value) : parseFloat(el.value);
   return isNaN(v) ? (def ?? campos[key]?.padrao ?? 0) : v;
 }
 
@@ -907,33 +955,27 @@ window.calcular = function() {
   if (s.nrr      >= bm.nrr.limites.ok)            score+=2; else if (s.nrr      >= bm.nrr.limites.warn)      score+=1;
 
   const health = score>=7 ? 'healthy' : score>=4 ? 'warning' : 'critical';
-render({ s, growthRate, rule40, payback, ltvcac, ltvDesc, vpl, smRatio, health });
+  render({ s, growthRate, rule40, payback, ltvcac, ltvDesc, vpl, smRatio, health });
 
-console.log('CHEGOU ANTES DO ENVIO');
+  // ── Envia para a planilha na primeira execução ──
+  const usuario = lerDadosUsuario();
+  enviarParaPlanilha({
+    nome:        usuario.nome,
+    email:       usuario.email,
+    empresa:     usuario.empresa,
+    cargo:       usuario.cargo,
+    estagio:     s.estagio,
+    gtm:         s.gtm,
+    arrAtual:    s.arrAtual,
+    arrAnterior: s.arrAnterior,
+    crescimento: fmtN(growthRate, 1) + '%',
+    cac:         s.cacTotal,
+    nmrr:        s.nmrr,
+    payback:     Math.round(payback),
+    health:      health
+  });
 
-// ── Envia para a planilha na primeira execução ──
-const usuario = lerDadosUsuario();
-console.log('USUARIO LIDO:', usuario);
-
-enviarParaPlanilha({
-  nome:        usuario.nome,
-  email:       usuario.email,
-  empresa:     usuario.empresa,
-  cargo:       usuario.cargo,
-  estagio:     s.estagio,
-  gtm:         s.gtm,
-  arrAtual:    s.arrAtual,
-  arrAnterior: s.arrAnterior,
-  crescimento: fmtN(growthRate, 1) + '%',
-  cac:         s.cacTotal,
-  nmrr:        s.nmrr,
-  payback:     Math.round(payback),
-  health:      health
-});
-
-console.log('CHAMOU enviarParaPlanilha');
-
-goToStep(4);
+  goToStep(4);
 };
 
 // ── RENDER ────────────────────────────────────────────────
@@ -1035,7 +1077,7 @@ function render(c) {
   const lista = ativas.length ? ativas : [alavancas.find(a=>a.condicao==='saudavel')];
   document.getElementById('actions-list').innerHTML = lista.filter(Boolean).map(a => `
     <div class="action-item">
-      <div class="action-icon ${a.cor}">${a.icone}</div>
+      <div class="action-icon roxo">${getActionIcon(a.condicao)}</div>
       <div>
         <div class="action-title">${a.titulo}</div>
         <div class="action-desc">${a.descricao}</div>
@@ -1088,6 +1130,22 @@ function evalCond(cond, res) {
   if (op==='>') return r>n;
   if (op==='<') return r<n;
   return false;
+}
+
+function getActionIcon(cond) {
+  const icons = {
+    'payback > 18':
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--roxo)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="6 14 12 20 18 14"/></svg>',
+    'ltvcac < 3':
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--roxo)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>',
+    'crescimento < 25':
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--roxo)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>',
+    'rule40 < 40':
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--roxo)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="22"/><path d="M5 22h14"/><line x1="3" y1="8" x2="21" y2="8"/><polyline points="3 8 7 16 11 8"/><polyline points="13 8 17 16 21 8"/></svg>',
+    'saudavel':
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--roxo)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  };
+  return icons[cond] || '';
 }
 
 function fmtN(n,d) { return (n<0?'−':'')+Math.abs(n).toFixed(d); }
