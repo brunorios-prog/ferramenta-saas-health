@@ -298,10 +298,10 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
   padding: 6px 14px; border-radius: 100px;
   font-size: 12px; font-weight: 700; border: 1px solid;
 }
-.health-pill.healthy { background: var(--verdeDim); color: var(--verde); border-color: var(--verde); }
+.health-pill.healthy { background: var(--positivoDim); color: var(--positivo); border-color: var(--positivo); }
 .health-pill.warning { background: var(--atencaoDim); color: var(--atencao); border-color: var(--atencao); }
-.health-pill.critical { background: var(--vermelhoDim); color: var(--vermelho); border-color: var(--vermelho); }
-.health-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.health-pill.critical { background: var(--negativoDim); color: var(--negativo); border-color: var(--negativo); }
+.health-icon { display: inline-flex; flex-shrink: 0; }
 
 /* Block */
 .result-block { margin-bottom: 28px; }
@@ -327,9 +327,9 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
   top: 0; left: 0; right: 0; height: 3px;
   border-radius: 10px 10px 0 0;
 }
-.metric-card.ok::after   { background: var(--verde); }
+.metric-card.ok::after   { background: var(--positivo); }
 .metric-card.warn::after { background: var(--atencao); }
-.metric-card.crit::after { background: var(--vermelho); }
+.metric-card.crit::after { background: var(--negativo); }
 .metric-card.info::after { background: var(--roxo); }
 
 .metric-label {
@@ -340,10 +340,12 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 .metric-value {
   font-family: 'Manrope', sans-serif;
   font-size: 24px; font-weight: 700; margin-bottom: 2px;
+  display: flex; align-items: center; gap: 7px;
 }
-.metric-card.ok   .metric-value { color: var(--verde); }
+.metric-value .tier-icon { flex-shrink: 0; }
+.metric-card.ok   .metric-value { color: var(--positivo); }
 .metric-card.warn .metric-value { color: var(--atencao); }
-.metric-card.crit .metric-value { color: var(--vermelho); }
+.metric-card.crit .metric-value { color: var(--negativo); }
 .metric-card.info .metric-value { color: var(--roxo); }
 .metric-bench { font-size: 11px; color: var(--textoSuave); }
 .metric-diagnosis {
@@ -356,18 +358,18 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 .bench-item { margin-bottom: 16px; }
 .bench-top { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
 .bench-name { font-weight: 500; color: var(--texto); }
-.bench-yours { font-weight: 700; }
-.bench-yours.ok   { color: var(--verde); }
+.bench-yours { font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
+.bench-yours.ok   { color: var(--positivo); }
 .bench-yours.warn { color: var(--atencao); }
-.bench-yours.crit { color: var(--vermelho); }
+.bench-yours.crit { color: var(--negativo); }
 .bench-track {
   height: 7px; background: var(--superficie2);
   border-radius: 4px; position: relative; overflow: visible;
 }
 .bench-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
-.bench-fill.ok   { background: var(--verde); }
+.bench-fill.ok   { background: var(--positivo); }
 .bench-fill.warn { background: var(--atencao); }
-.bench-fill.crit { background: var(--vermelho); }
+.bench-fill.crit { background: var(--negativo); }
 .bench-median {
   position: absolute; top: -3px;
   width: 2px; height: 13px;
@@ -377,13 +379,17 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 
 /* Diagnosis box */
 .diag-box { border-radius: 10px; padding: 18px 22px; margin-top: 6px; border: 1px solid; }
-.diag-box.healthy  { background: var(--verdeDim);    border-color: var(--verde); }
+.diag-box.healthy  { background: var(--positivoDim); border-color: var(--positivo); }
 .diag-box.warning  { background: var(--atencaoDim);  border-color: var(--atencao); }
-.diag-box.critical { background: var(--vermelhoDim); border-color: var(--vermelho); }
+.diag-box.critical { background: var(--negativoDim); border-color: var(--negativo); }
 .diag-title {
   font-family: 'Manrope', sans-serif;
   font-size: 15px; font-weight: 700; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 7px;
 }
+.diag-box.healthy  .diag-title { color: var(--positivo); }
+.diag-box.warning  .diag-title { color: var(--atencao); }
+.diag-box.critical .diag-title { color: var(--negativo); }
 .diag-text { font-size: 13px; line-height: 1.7; color: var(--textoMuted); }
 
 /* Scenarios */
@@ -398,9 +404,9 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
   text-transform: uppercase; margin-bottom: 8px;
   display: inline-block; padding: 2px 7px; border-radius: 4px;
 }
-.scenario-tag.conservador { background: var(--vermelhoDim); color: var(--vermelho); }
+.scenario-tag.conservador { background: var(--negativoDim); color: var(--negativo); }
 .scenario-tag.moderado    { background: var(--atencaoDim);  color: var(--atencao); }
-.scenario-tag.agressivo   { background: var(--verdeDim);    color: var(--verde); }
+.scenario-tag.agressivo   { background: var(--positivoDim); color: var(--positivo); }
 .scenario-arr { font-family: 'Manrope', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 2px; }
 .scenario-growth { font-size: 12px; color: var(--textoMuted); margin-bottom: 10px; }
 .scenario-row { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; }
@@ -419,10 +425,10 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
   display: flex; align-items: center; justify-content: center;
   font-size: 14px; flex-shrink: 0;
 }
-.action-icon.vermelho { background: var(--vermelhoDim); }
+.action-icon.vermelho { background: var(--negativoDim); }
 .action-icon.amarelo  { background: var(--atencaoDim); }
 .action-icon.roxo     { background: var(--roxoDim); }
-.action-icon.verde    { background: var(--verdeDim); }
+.action-icon.verde    { background: var(--positivoDim); }
 .action-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
 .action-desc  { font-size: 12px; color: var(--textoMuted); line-height: 1.5; }
 
@@ -607,7 +613,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
           <div class="step-eyebrow">Resultado</div>
           <h1 class="step-heading" style="font-size:20px; margin-bottom:8px">Diagnóstico da sua startup</h1>
           <div id="res-health-pill" class="health-pill critical">
-            <span class="health-dot"></span>
+            <span id="res-health-icon" class="health-icon"></span>
             <span id="res-health-label">—</span>
           </div>
         </div>
@@ -975,8 +981,10 @@ function render(c) {
   const { s, growthRate, rule40, payback, ltvcac, ltvDesc, vpl, smRatio, health } = c;
 
   // Pill
+  const healthTier = { healthy:'ok', warning:'warn', critical:'crit' }[health];
   const pill = document.getElementById('res-health-pill');
   pill.className = 'health-pill ' + health;
+  document.getElementById('res-health-icon').innerHTML = tierIcon(healthTier, 13);
   document.getElementById('res-health-label').textContent = diagnosticos[health].badgeLabel;
 
   // Block 1 — posição
@@ -1037,7 +1045,7 @@ function render(c) {
     .replace('{ltvcac}', fmtN(ltvcac,1));
   document.getElementById('diag-box').innerHTML = `
     <div class="diag-box ${health}">
-      <div class="diag-title">${d.titulo}</div>
+      <div class="diag-title">${tierIcon(healthTier, 15)}${d.titulo}</div>
       <div class="diag-text">${txt}</div>
     </div>`;
 
@@ -1078,10 +1086,23 @@ function render(c) {
 }
 
 // ── HELPERS ──────────────────────────────────────────────
+// Ícones monocromáticos (herdam a cor via currentColor) que reforçam o
+// nível do indicador — check (bom), atenção (neutro), x (ruim) — já que a
+// escala de cor é toda dentro da família roxo/preto/branco da marca.
+function tierIcon(tier, size) {
+  size = size || 14;
+  const icons = {
+    ok: `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="tier-icon"><polyline points="20 6 9 17 4 12"/></svg>`,
+    warn: `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" class="tier-icon"><path d="M12 3.5 21.5 20.5H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><circle cx="12" cy="17.3" r="1" fill="currentColor" stroke="none"/></svg>`,
+    crit: `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="tier-icon"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+  };
+  return icons[tier] || '';
+}
+
 function mCard(label, value, status, bench, diag) {
   return `<div class="metric-card ${status}">
     <div class="metric-label">${label}</div>
-    <div class="metric-value">${value}</div>
+    <div class="metric-value">${tierIcon(status)}${value}</div>
     <div class="metric-bench">${bench}</div>
     <div class="metric-diagnosis">${diag}</div>
   </div>`;
@@ -1097,7 +1118,7 @@ function bBar(cfg, value) {
   return `<div class="bench-item">
     <div class="bench-top">
       <span class="bench-name">${cfg.label}</span>
-      <span class="bench-yours ${status}">${fmtN(value,1)}${cfg.unidade} (você)</span>
+      <span class="bench-yours ${status}">${tierIcon(status, 12)}${fmtN(value,1)}${cfg.unidade} (você)</span>
     </div>
     <div class="bench-track">
       <div class="bench-fill ${status}" style="width:${pct}%"></div>

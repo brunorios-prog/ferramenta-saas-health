@@ -30,14 +30,20 @@ export const cores = {
   roxoDim:       "#EEE9FF",   // fundo de destaque roxo (claro)
   roxoEscuro:    "#3D35B0",   // hover de botões roxos
 
-  verde:         "#16A34A",   // métrica saudável
-  verdeDim:      "#DCFCE7",   // fundo verde claro
+  verde:         "#16A34A",   // usado apenas no indicador de etapa concluída da sidebar
+  verdeDim:      "#DCFCE7",   // fundo verde claro (idem)
 
-  vermelho:      "#DC2626",   // alerta / crítico
-  vermelhoDim:   "#FEE2E2",   // fundo vermelho claro
+  // Escala de nível dos indicadores da tela de diagnóstico — apenas
+  // variações de tom/opacidade do Accent (#442CE4) e do Primary (#070F1A),
+  // sem verde/vermelho genéricos. Ver mapeamento em `benchmarks`/render().
+  positivo:      "#442CE4",   // nível bom — Accent oficial, sem alteração
+  positivoDim:   "#DBD7ED",   // fundo — Accent ~15% sobre o Secondary
 
-  atencao:       "#8B5CF6",   // atenção / nível intermediário — roxo violeta da marca (substitui o amarelo genérico)
-  atencaoDim:    "#EDE6FE",   // fundo claro do tom de atenção
+  atencao:       "#8B5CF6",   // nível neutro/mediano — Accent clareado/dessaturado
+  atencaoDim:    "#EDE6FE",   // fundo claro do tom neutro
+
+  negativo:      "#131542",   // nível ruim — quase preto com leve matiz arroxeado (Primary + Accent)
+  negativoDim:   "#DEDEDA",   // fundo — cinza claro neutro (Primary ~10% sobre o Secondary)
 };
 
 
