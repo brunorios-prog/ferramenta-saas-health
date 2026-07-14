@@ -40,13 +40,6 @@ body {
   margin-bottom: 8px;
   display: flex; align-items: center; gap: 8px;
 }
-.logo-badge {
-  background: var(--roxo);
-  color: #fff;
-  font-size: 10px; font-weight: 700;
-  padding: 2px 7px; border-radius: 4px;
-  letter-spacing: 0.06em; text-transform: uppercase;
-}
 .logo-sub {
   font-size: 11px; color: var(--textoMuted);
   margin-bottom: 32px; line-height: 1.4;
@@ -117,10 +110,9 @@ body {
 }
 .step-sub { font-size: 14px; color: var(--textoMuted); max-width: 540px; margin-bottom: 28px; }
 .step-tip {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: 12px; color: var(--textoMuted); font-style: italic;
-  background: var(--roxoDim); border: 1px solid rgba(91,79,232,0.18);
-  border-radius: 6px; padding: 4px 10px; margin-bottom: 24px;
+  display: block;
+  font-size: 12px; color: var(--roxo); font-style: italic;
+  margin-bottom: 24px;
 }
 
 /* ── PERIOD TABS ──────────────────────────────── */
@@ -137,7 +129,8 @@ body {
   background: transparent; color: var(--textoMuted);
   transition: all 0.15s; font-family: 'Manrope', sans-serif;
 }
-.period-tab.active { background: var(--superficie); color: var(--texto); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.period-tab:hover:not(.active) { background: var(--roxoDim); color: var(--roxo); }
+.period-tab.active { background: var(--roxo); color: #fff; box-shadow: 0 1px 3px rgba(91,79,232,0.35); }
 
 /* ── FORM ─────────────────────────────────────── */
 .section-label {
@@ -182,7 +175,7 @@ body {
   background: var(--texto); color: var(--fundo);
   border-radius: 7px; padding: 8px 12px;
   font-size: 12px; font-weight: 400;
-  white-space: normal; max-width: 320px;
+  white-space: normal; width: max-content; max-width: min(260px, 86vw);
   text-transform: none; letter-spacing: 0;
   z-index: 200; line-height: 1.5;
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
@@ -306,7 +299,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
   font-size: 12px; font-weight: 700; border: 1px solid;
 }
 .health-pill.healthy { background: var(--verdeDim); color: var(--verde); border-color: var(--verde); }
-.health-pill.warning { background: var(--amareloDim); color: var(--amarelo); border-color: var(--amarelo); }
+.health-pill.warning { background: var(--atencaoDim); color: var(--atencao); border-color: var(--atencao); }
 .health-pill.critical { background: var(--vermelhoDim); color: var(--vermelho); border-color: var(--vermelho); }
 .health-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
@@ -335,7 +328,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
   border-radius: 10px 10px 0 0;
 }
 .metric-card.ok::after   { background: var(--verde); }
-.metric-card.warn::after { background: var(--amarelo); }
+.metric-card.warn::after { background: var(--atencao); }
 .metric-card.crit::after { background: var(--vermelho); }
 .metric-card.info::after { background: var(--roxo); }
 
@@ -349,7 +342,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
   font-size: 24px; font-weight: 700; margin-bottom: 2px;
 }
 .metric-card.ok   .metric-value { color: var(--verde); }
-.metric-card.warn .metric-value { color: var(--amarelo); }
+.metric-card.warn .metric-value { color: var(--atencao); }
 .metric-card.crit .metric-value { color: var(--vermelho); }
 .metric-card.info .metric-value { color: var(--roxo); }
 .metric-bench { font-size: 11px; color: var(--textoSuave); }
@@ -365,7 +358,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 .bench-name { font-weight: 500; color: var(--texto); }
 .bench-yours { font-weight: 700; }
 .bench-yours.ok   { color: var(--verde); }
-.bench-yours.warn { color: var(--amarelo); }
+.bench-yours.warn { color: var(--atencao); }
 .bench-yours.crit { color: var(--vermelho); }
 .bench-track {
   height: 7px; background: var(--superficie2);
@@ -373,7 +366,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 }
 .bench-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
 .bench-fill.ok   { background: var(--verde); }
-.bench-fill.warn { background: var(--amarelo); }
+.bench-fill.warn { background: var(--atencao); }
 .bench-fill.crit { background: var(--vermelho); }
 .bench-median {
   position: absolute; top: -3px;
@@ -385,7 +378,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 /* Diagnosis box */
 .diag-box { border-radius: 10px; padding: 18px 22px; margin-top: 6px; border: 1px solid; }
 .diag-box.healthy  { background: var(--verdeDim);    border-color: var(--verde); }
-.diag-box.warning  { background: var(--amareloDim);  border-color: var(--amarelo); }
+.diag-box.warning  { background: var(--atencaoDim);  border-color: var(--atencao); }
 .diag-box.critical { background: var(--vermelhoDim); border-color: var(--vermelho); }
 .diag-title {
   font-family: 'Manrope', sans-serif;
@@ -406,7 +399,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
   display: inline-block; padding: 2px 7px; border-radius: 4px;
 }
 .scenario-tag.conservador { background: var(--vermelhoDim); color: var(--vermelho); }
-.scenario-tag.moderado    { background: var(--amareloDim);  color: var(--amarelo); }
+.scenario-tag.moderado    { background: var(--atencaoDim);  color: var(--atencao); }
 .scenario-tag.agressivo   { background: var(--verdeDim);    color: var(--verde); }
 .scenario-arr { font-family: 'Manrope', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 2px; }
 .scenario-growth { font-size: 12px; color: var(--textoMuted); margin-bottom: 10px; }
@@ -427,7 +420,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
   font-size: 14px; flex-shrink: 0;
 }
 .action-icon.vermelho { background: var(--vermelhoDim); }
-.action-icon.amarelo  { background: var(--amareloDim); }
+.action-icon.amarelo  { background: var(--atencaoDim); }
 .action-icon.roxo     { background: var(--roxoDim); }
 .action-icon.verde    { background: var(--verdeDim); }
 .action-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
@@ -448,7 +441,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 
 /* Alert adicional de validação */
 .validation-note {
-  background: var(--amareloDim); border: 1px solid var(--amarelo);
+  background: var(--roxoDim); border: 1px solid var(--roxo);
   border-radius: 7px; padding: 10px 14px;
   font-size: 12px; color: var(--texto); line-height: 1.5;
   margin-bottom: 14px; display: none;
@@ -483,7 +476,6 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
   <aside class="sidebar">
     <div class="logo">
       <span id="logo-nome">SaaS Health</span>
-      <span class="logo-badge">Beta</span>
     </div>
     <p class="logo-sub" id="logo-sub"></p>
     <div class="steps" id="steps-nav"></div>
@@ -502,7 +494,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
       <div class="step-eyebrow">Sobre a empresa</div>
       <h1 class="step-heading">Vamos contextualizar sua operação</h1>
       <p class="step-sub" style="margin-bottom:8px">Comece escolhendo o estágio e modelo de negócio. Depois preencha os dados de receita.</p>
-      <p class="step-tip">💡 Use o slider para valores aproximados ou digite o número exato.</p>
+      <p class="step-tip">Use o slider para valores aproximados ou digite o número exato.</p>
 
       <!-- Segmentações primeiro -->
       <div class="section-label">Estágio & modelo</div>

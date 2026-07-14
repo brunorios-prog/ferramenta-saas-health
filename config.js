@@ -36,8 +36,8 @@ export const cores = {
   vermelho:      "#DC2626",   // alerta / crítico
   vermelhoDim:   "#FEE2E2",   // fundo vermelho claro
 
-  amarelo:       "#D97706",   // atenção / warning
-  amareloDim:    "#FEF3C7",   // fundo amarelo claro
+  atencao:       "#8B5CF6",   // atenção / nível intermediário — roxo violeta da marca (substitui o amarelo genérico)
+  atencaoDim:    "#EDE6FE",   // fundo claro do tom de atenção
 };
 
 
