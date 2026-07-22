@@ -969,12 +969,11 @@ window.calcular = function() {
     estagio:     s.estagio,
     gtm:         s.gtm,
     arrAtual:    s.arrAtual,
-    arrAnterior: s.arrAnterior,
     crescimento: fmtN(growthRate, 1) + '%',
-    cac:         s.cacTotal,
-    nmrr:        s.nmrr,
+    smMensal:    Math.round(s.cacTotal / 12),
+    health:      health,
     payback:     Math.round(payback),
-    health:      health
+    ltvcac:      fmtN(ltvcac, 1) + '×'
   });
 
   goToStep(4);
